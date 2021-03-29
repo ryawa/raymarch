@@ -4,6 +4,24 @@ precision mediump float;
 
 uniform vec2 u_resolution;
 
+// combine primitives
+float opUnion(float d1, float d2)
+{
+    return min(d1, d2);
+}
+
+// intersect primitives
+float opIntersection(float d1, float d2)
+{
+    return max(d1, d2);
+}
+
+// carve primitives
+float opSubtraction(float d1, float d2)
+{
+    return max(-d1, d2);
+}
+
 // calculate signed distance from pos to a sphere
 float sphereSDF(vec3 pos, vec3 center, float radius)
 {
