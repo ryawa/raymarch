@@ -4,6 +4,21 @@ precision mediump float;
 
 uniform vec2 u_resolution;
 
+struct light
+{
+    vec3 pos;
+    vec3 intensity;
+    float attenuation;
+    float ambient;
+};
+
+struct material
+{
+    vec3 color;
+    vec3 specular;
+    float shininess;
+};
+
 // combine primitives
 float opUnion(float d1, float d2)
 {
