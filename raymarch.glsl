@@ -49,6 +49,7 @@ float SDF(vec3 pos)
     return sphereSDF(pos, vec3(0.0), 1.0);
 }
 
+// calculate normal
 vec3 normal(vec3 pos)
 {
     const vec2 STEP = vec2(0.0001, 0.0);
