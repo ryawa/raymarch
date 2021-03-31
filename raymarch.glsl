@@ -116,12 +116,12 @@ vec3 render(vec3 rayOrigin, vec3 rayDir)
     light l = light(vec3(1.0, 1.0, 1.0), vec3(1.0), 1.0, 0.05);
     material m = material(vec3(0.3, 0.8, 0.2), vec3(1.0), 10.0);
     float depth = castRay(rayOrigin, rayDir);
-    if (depth < 0.0)
+    // skybox
+    vec3 color = vec3(0.3, 0.3, 0.6) - (rayDir.y * 0.25);
+    if (depth >= 0.0)
     {
-        // skybox
-        return vec3(0.3, 0.3, 0.6) - (rayDir.y * 0.25);
+        color = phong(rayOrigin + rayDir * depth, rayOrigin, l, m);
     }
-    vec3 color = phong(rayOrigin + rayDir * depth, rayOrigin, l, m);
     return pow(color, gamma);
 }
 
