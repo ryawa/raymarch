@@ -4,6 +4,12 @@ precision mediump float;
 
 uniform vec2 u_resolution;
 
+struct camera
+{
+    vec3 pos;
+    vec3 dir;
+};
+
 struct light
 {
     vec3 pos;
@@ -60,7 +66,7 @@ vec3 normal(vec3 pos)
 }
 
 // cast ray and return the distance from the origin to the scene
-float castRay(vec3 rayOrigin, vec3 rayDir)
+float castRay(camera cam)
 {
     const int MAX_STEPS = 128;
     const float MAX_DEPTH = 100.0;
@@ -70,7 +76,7 @@ float castRay(vec3 rayOrigin, vec3 rayDir)
     for (int steps = 0; steps < MAX_STEPS; steps++)
     {
         // distance to closest object in scene
-        float dist = SDF(rayOrigin + rayDir * depth);
+        float dist = SDF(cam.pos + cam.dir * depth);
         if (dist < HIT_DIST)
         {
             return depth;
@@ -111,25 +117,24 @@ vec3 phong(vec3 surfacePos, vec3 camPos, light l, material m)
 }
 
 // render scene
-vec3 render(vec3 rayOrigin, vec3 rayDir)
+vec3 render(camera cam)
 {
     const vec3 gamma = vec3(1.0 / 2.2);
-    light l = light(vec3(1.0, 1.0, 1.0), vec3(1.0), 1.0, 0.05);
+    light l = light(vec3(1.0, 1.0, -1.0), vec3(1.0), 1.0, 0.05);
     material m = material(vec3(0.3, 0.8, 0.2), vec3(1.0), 10.0);
-    float depth = castRay(rayOrigin, rayDir);
+    float depth = castRay(cam);
     // skybox
-    vec3 color = vec3(0.3, 0.3, 0.6) - (rayDir.y * 0.25);
+    vec3 color = vec3(0.3, 0.3, 0.6) - (cam.dir.y * 0.25);
     if (depth >= 0.0)
     {
-        color = phong(rayOrigin + rayDir * depth, rayOrigin, l, m);
+        color = phong(cam.pos + cam.dir * depth, cam.pos, l, m);
     }
     return pow(color, gamma);
 }
 
 void main()
 {
-    vec3 camPos = vec3(0.0, 0.0, 2.0);
-    vec2 uv = gl_FragCoord.xy / u_resolution * 2.0 - 1.0;
-    vec3 camDir = vec3(uv, -1.0);
-    gl_FragColor = vec4(render(camPos, camDir), 1.0);
+    vec2 st = gl_FragCoord.xy / u_resolution * 2.0 - 1.0;
+    camera cam = camera(vec3(0.0, 0.0, -2.0), vec3(st, 1.0));
+    gl_FragColor = vec4(render(cam), 1.0);
 }
